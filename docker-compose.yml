@@ -123,6 +123,7 @@ services:
       - kafka
       - mongodb
       - config-server
+      - eureka-server
     networks:
       - microservices-net
 
@@ -137,6 +138,7 @@ services:
       - kafka
       - mongodb
       - config-server
+      - eureka-server
     networks:
       - microservices-net
 
@@ -151,6 +153,7 @@ services:
       - kafka
       - mongodb
       - config-server
+      - eureka-server
     networks:
       - microservices-net
 
@@ -164,6 +167,7 @@ services:
       - customer-service
       - order-service
       - config-server
+      - eureka-server
     networks:
       - microservices-net
 
@@ -175,6 +179,7 @@ services:
     depends_on:
       - kafka
       - config-server
+      - eureka-server
     networks:
       - microservices-net
 
@@ -186,6 +191,7 @@ services:
     depends_on:
       - kafka
       - config-server
+      - eureka-server
     networks:
       - microservices-net
 
@@ -194,6 +200,8 @@ services:
     image: ayoub1411/discovery:latest
     ports:
       - "8761:8761"
+    depends_on:
+      - config-server
     networks:
       - microservices-net
 
