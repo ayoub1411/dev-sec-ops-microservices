@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [product-service, order-service, customer-service] # your microservices
+        service: [product, order, customer,payment,notification,gateway,discovery,config-server] # your microservices
 
     steps:
       - name: Checkout code
