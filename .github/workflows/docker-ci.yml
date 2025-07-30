@@ -12,7 +12,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    strategy:s
+    strategy:
       matrix:
         service: [product-service, order-service, customer-service] # your microservices
 
