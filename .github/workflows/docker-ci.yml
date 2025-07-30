@@ -2,7 +2,7 @@ name: Build and Push Docker Images
 
 on:
   push:
-    branches: [main]
+    branches: [main,master]
     paths:
       - 'services/**'
       - '.github/workflows/**'
@@ -12,7 +12,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    strategy:
+    strategy:s
       matrix:
         service: [product-service, order-service, customer-service] # your microservices
 
