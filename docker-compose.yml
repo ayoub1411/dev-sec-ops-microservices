@@ -1,4 +1,6 @@
+
 services:
+  # Infrastructure services
   postgresql:
     container_name: ms_pg_sql
     image: postgres
@@ -38,30 +40,34 @@ services:
       - microservices-net
 
   mongodb:
-    image: mongo
     container_name: mongo_db
-    ports:
-      - 27017:27017
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: alibou
+      MONGO_INITDB_ROOT_PASSWORD: alibou
     volumes:
       - mongo:/data
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=alibou
-      - MONGO_INITDB_ROOT_PASSWORD=alibou
+    ports:
+      - 27017:27017
+    networks:
+      - microservices-net
 
   mongo-express:
-    image: mongo-express
     container_name: mongo_express
+    image: mongo-express
     restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: alibou
+      ME_CONFIG_MONGODB_ADMINPASSWORD: alibou
+      ME_CONFIG_MONGODB_SERVER: mongo_db
     ports:
       - 8081:8081
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=alibou
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=alibou
-      - ME_CONFIG_MONGODB_SERVER=mongodb
+    networks:
+      - microservices-net
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
+    image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -70,11 +76,10 @@ services:
       - "22181:2181"
     networks:
       - microservices-net
+
   kafka:
-    image: confluentinc/cp-kafka:7.4.3
     container_name: ms_kafka
-    ports:
-      - "9092:9092"
+    image: confluentinc/cp-kafka:7.4.3
     depends_on:
       - zookeeper
     environment:
@@ -83,7 +88,10 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ms_kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+    ports:
+      - "9092:9092"
     networks:
       - microservices-net
 
@@ -93,6 +101,101 @@ services:
     ports:
       - 1080:1080
       - 1025:1025
+
+  # Config server service
+  config-server:
+    container_name: config-server
+    image: ayoub1411/config-server:latest
+    ports:
+      - "8888:8888"
+    networks:
+      - microservices-net
+
+  # Your microservices pulling images from Docker Hub
+  product-service:
+    container_name: product-service
+    image: ayoub1411/product:latest
+    ports:
+      - "8050:8050"
+
+    depends_on:
+      - postgresql
+      - kafka
+      - mongodb
+      - config-server
+    networks:
+      - microservices-net
+
+  customer-service:
+    container_name: customer-service
+    image: ayoub1411/customer:latest
+    ports:
+      - "8090:8090"
+
+    depends_on:
+      - postgresql
+      - kafka
+      - mongodb
+      - config-server
+    networks:
+      - microservices-net
+
+  order-service:
+    container_name: order-service
+    image: ayoub1411/order:latest
+    ports:
+      - "8070:8070"
+
+    depends_on:
+      - postgresql
+      - kafka
+      - mongodb
+      - config-server
+    networks:
+      - microservices-net
+
+  gateway:
+    container_name: gateway
+    image: ayoub1411/gateway:latest
+    ports:
+      - "8222:8222"
+    depends_on:
+      - product-service
+      - customer-service
+      - order-service
+      - config-server
+    networks:
+      - microservices-net
+
+  notification:
+    container_name: notification
+    image: ayoub1411/notification:latest
+    ports:
+      - "8040:8040"
+    depends_on:
+      - kafka
+      - config-server
+    networks:
+      - microservices-net
+
+  payment:
+    container_name: payment
+    image: ayoub1411/payment:latest
+    ports:
+      - "8060:8060"
+    depends_on:
+      - kafka
+      - config-server
+    networks:
+      - microservices-net
+
+  eureka-server:
+    container_name: discovery
+    image: ayoub1411/discovery:latest
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-net
 
 networks:
   microservices-net:
