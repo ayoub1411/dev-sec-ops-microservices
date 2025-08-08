@@ -1,9 +1,4 @@
-eureka:
-  instance:
 
-  client:
-    service-url:
-      defaultZone: http://eureka-server:8761/eureka
 name:
   value: alibou
 spring:

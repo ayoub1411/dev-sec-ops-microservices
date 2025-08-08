@@ -20,7 +20,7 @@ spring:
           predicates:
             - Path=/api/v1/order-lines/**
         - id: product-service
-          uri: lb://product-service
+          uri: lb://product-service.default.svc.cluster.local
           predicates:
             - Path=/api/v1/products/**
         - id: payment-service
