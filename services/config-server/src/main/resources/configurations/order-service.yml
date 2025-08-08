@@ -21,6 +21,6 @@ spring:
 
 application:
   config:
-    customer-url: http://CUSTOMER-SERVICE:8090/api/v1/customers
-    payment-url: http://PAYMENT-SERVICE:8060/api/v1/payments
-    product-url: http://PRODUCT-SERVICE:8050/api/v1/products
+    customer-url: http://customer-service:8090/api/v1/customers
+    payment-url: http://payment-service:8060/api/v1/payments
+    product-url: http://product-service:8050/api/v1/products
