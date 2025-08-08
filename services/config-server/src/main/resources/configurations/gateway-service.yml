@@ -3,9 +3,7 @@ server:
 spring:
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
+
       routes:
         - id: customer-service
           uri: lb://customer-service
